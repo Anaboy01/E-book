@@ -53,8 +53,31 @@ const getUserOrders = asyncHandler(async (req, res) => {
 });
 
 
+const getOrderById = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  const userId = req.user._id;
+
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    res.status(404);
+    throw new Error("Order not found");
+  }
+
+
+  if (order.user.id.toString() !== userId.toString()) {
+    res.status(403);
+    throw new Error("Not authorized to view this order");
+  }
+
+  res.status(200).json(order);
+});
+
+
+
 
 module.exports = {
     placeOrder,
-    getUserOrders
+    getUserOrders,
+    getOrderById
 }
